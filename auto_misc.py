@@ -202,7 +202,7 @@ while True:
 
   if non_match_count > 20:
     info("Career lobby stuck, quitting.")
-    quit()
+    device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
 
   def click_match(matches, name = None):
     global previous_click_name, same_button_clicks, non_match_count
@@ -216,7 +216,7 @@ while True:
           debug(f"same_button_clicks: {same_button_clicks} ")
           if same_button_clicks > 20:
             info("Career lobby stuck, quitting.")
-            quit()
+            device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
         if name == previous_click_name:
           debug(f"name == previous_click_name")
           same_button_clicks += 1

@@ -40,10 +40,10 @@ def unity_cup_function():
       break
     tries += 1
     if tries > 20:
-      raise ValueError("Select opponent button not found, please report this.")
+      device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
   rank_matches = device_action.match_template("assets/unity/team_rank.png", screenshot)
   if not select_opponent_btn and not s_rank_opponent:
-    raise ValueError("Select opponent and zenith race button not found, please report this.")
+    device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
   elif select_opponent_btn:
     select_opponent_mouse_pos = (select_opponent_btn[0], select_opponent_btn[1])
   elif s_rank_opponent:
@@ -52,7 +52,7 @@ def unity_cup_function():
     unity_race_start()
     return True
   if len(rank_matches) == 0:
-    raise ValueError("Team rank not found, please report this.")
+    device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
   matchups = []
   # sort matchups by Y coords
   rank_matches.sort(key=lambda x: x[1])
@@ -73,7 +73,7 @@ def unity_cup_function():
         break
       tries += 1
       if tries > 10:
-        raise ValueError("Affinity screen not found, please report this.")
+        device_action.stop_bot("stuck", f"assets/notifications/{config.ERROR_NOTIFICATION}", volume = config.NOTIFICATION_VOLUME)
       device_action.flush_screenshot_cache()
     
     screenshot = device_action.screenshot(region_xywh=constants.UNITY_TEAM_MATCHUP_REGION)

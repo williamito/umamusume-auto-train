@@ -30,6 +30,12 @@ def stop_bot(message = None, notification_string = None, volume = 0.3):
   flush_screenshot_cache()
   bot.is_bot_running = False
 
+  if bot.on_stop_callback:
+    try:
+      bot.on_stop_callback(message)
+    except Exception as e:
+      error(f"Error in on_stop_callback: {e}")
+
   if notification_string is not None:
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.load(f"{notification_string}")
