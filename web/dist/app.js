@@ -27527,40 +27527,51 @@ function Tooltips({ children, size: size2 = "default" }) {
 }
 const WEBHOOK_STORAGE_KEY = "webhook_url";
 const PROGRESS_STORAGE_KEY = "webhook_progress_enabled";
+const SKILL_BUY_STORAGE_KEY = "webhook_skill_buy_enabled";
 function readStoredUrl() {
   return localStorage.getItem(WEBHOOK_STORAGE_KEY) || "";
 }
 function readStoredProgress() {
   return localStorage.getItem(PROGRESS_STORAGE_KEY) !== "false";
 }
-function syncToServer(url, progress) {
+function readStoredSkillBuy() {
+  return localStorage.getItem(SKILL_BUY_STORAGE_KEY) !== "false";
+}
+function syncToServer(url, progress, skillBuy) {
   fetch("/api/webhook", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ webhook_url: url, webhook_progress_enabled: progress })
+    body: JSON.stringify({ webhook_url: url, webhook_progress_enabled: progress, webhook_skill_buy_enabled: skillBuy })
   }).catch(console.error);
 }
-function persistAndSync(url, progress) {
+function persistAndSync(url, progress, skillBuy) {
   localStorage.setItem(WEBHOOK_STORAGE_KEY, url);
   localStorage.setItem(PROGRESS_STORAGE_KEY, progress.toString());
-  syncToServer(url, progress);
+  localStorage.setItem(SKILL_BUY_STORAGE_KEY, skillBuy.toString());
+  syncToServer(url, progress, skillBuy);
 }
 function WebhookSettings() {
   const [webhookUrl, setWebhookUrl] = reactExports.useState(readStoredUrl);
   const [progressEnabled, setProgressEnabled] = reactExports.useState(readStoredProgress);
+  const [skillBuyEnabled, setSkillBuyEnabled] = reactExports.useState(readStoredSkillBuy);
   const hasSynced = reactExports.useRef(false);
   reactExports.useEffect(() => {
     if (hasSynced.current) return;
     hasSynced.current = true;
-    syncToServer(readStoredUrl(), readStoredProgress());
+    syncToServer(readStoredUrl(), readStoredProgress(), readStoredSkillBuy());
   }, []);
   const commitUrl = () => {
-    persistAndSync(webhookUrl, progressEnabled);
+    persistAndSync(webhookUrl, progressEnabled, skillBuyEnabled);
   };
   const toggleProgress = () => {
     const next = !progressEnabled;
     setProgressEnabled(next);
-    persistAndSync(webhookUrl, next);
+    persistAndSync(webhookUrl, next, skillBuyEnabled);
+  };
+  const toggleSkillBuy = () => {
+    const next = !skillBuyEnabled;
+    setSkillBuyEnabled(next);
+    persistAndSync(webhookUrl, progressEnabled, next);
   };
   const hasWebhook = !!webhookUrl.trim();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -27590,6 +27601,18 @@ function WebhookSettings() {
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-base", children: "Yearly Progress Updates" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltips, { children: "Sends a stat snapshot at the start of Classic Year, Senior Year, and URA Finals." })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `uma-label ${hasWebhook ? "" : "disabled"}`, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Checkbox,
+        {
+          checked: skillBuyEnabled,
+          disabled: !hasWebhook,
+          onCheckedChange: toggleSkillBuy
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-base", children: "Skill Buy Notifications" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltips, { children: "Sends a notification listing the skills purchased each time the bot buys skills." })
     ] })
   ] });
 }
