@@ -23,6 +23,7 @@ class StopReason(str, Enum):
     FINISHED = "finished"
     STUCK = "stuck"
     CLAW_MACHINE = "claw machine"
+    RACE_LOSS = "race loss"
     UNKNOWN = "unknown"
 
 
@@ -30,6 +31,7 @@ _STOP_STYLES = {
     StopReason.FINISHED: (_COLOR_SUCCESS, f"🎉 Training Finished! - (Instance {bot.instance})"),
     StopReason.STUCK: (_COLOR_ERROR, f"🚨 Tazuna Got Stuck - (Instance {bot.instance})"),
     StopReason.CLAW_MACHINE: (_COLOR_WARNING, f"🕹️ Claw Machine - Manual Play Required - (Instance {bot.instance})"),
+    StopReason.RACE_LOSS: (_COLOR_ERROR, f"🏇 Too Many Race Losses - (Instance {bot.instance})"),
     StopReason.UNKNOWN: (_COLOR_ERROR, f"⚠️ Uma-Auto Stopped - (Instance {bot.instance})"),
 }
 

@@ -85,12 +85,14 @@ if LIMIT_TURNS is None:
 
 non_match_count = 0
 action_count=0
+race_loss_count = 0
 last_state = CleanDefaultDict()
 
 def career_lobby(dry_run_turn=False):
-  global last_state, action_count, non_match_count
+  global last_state, action_count, non_match_count, race_loss_count
   non_match_count = 0
   action_count=0
+  race_loss_count = 0
   sleep(1)
   bot.PREFERRED_POSITION_SET = False
   constants.SCENARIO_NAME = ""
@@ -149,8 +151,17 @@ def career_lobby(dry_run_turn=False):
       if matches.get("cancel", False):
         clock_icon = device_action.match_template("assets/icons/clock_icon.png", screenshot=screenshot, threshold=0.9)
         if clock_icon:
-          debug("Lost race, wait for input.")
-          non_match_count += 1
+          if config.AUTO_RETRY_RACE:
+            race_loss_count += 1
+            if race_loss_count >= config.MAX_RACE_RETRIES:
+              info(f"Lost {race_loss_count} races in a row, stopping.")
+              device_action.stop_bot(StopReason.RACE_LOSS, f"assets/notifications/{config.ERROR_NOTIFICATION}", volume=config.NOTIFICATION_VOLUME)
+            info(f"Lost race ({race_loss_count}/{config.MAX_RACE_RETRIES}), auto-retrying.")
+            click_match(matches.get("cancel"))
+            non_match_count = 0
+          else:
+            debug("Lost race, wait for input.")
+            non_match_count += 1
         elif click_match(matches.get("cancel")):
           debug("Pressed cancel.")
           non_match_count = 0
@@ -368,7 +379,8 @@ def career_lobby(dry_run_turn=False):
     return
 
 def record_and_finalize_turn(state_obj, action):
-  global last_state, action_count
+  global last_state, action_count, race_loss_count
+  race_loss_count = 0
   user_info_block(state_obj, last_state, action)
   record_turn(state_obj, last_state, action)
   last_state = state_obj

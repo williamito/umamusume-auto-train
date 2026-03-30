@@ -69,7 +69,9 @@ def reload_config():
     load_var('SCENARIO_GIMMICK_WEIGHT', config["scenario_gimmick_weight"])
     load_var('USE_SKIP_CLAW_MACHINE', config["use_skip_claw_machine"])
     load_var('STOP_AT_TURNS', config["stop_at_turns"])
-      
+    load_var('AUTO_RETRY_RACE', config["auto_retry_race"])
+    load_var('MAX_RACE_RETRIES', config["max_race_retries"])
+
   except KeyError as e:
     raise RuntimeError(f"Missing config key: {e.args[0]}, please copy it to config.json from config.template.json and try again")
 
