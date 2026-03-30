@@ -8,7 +8,7 @@ from core.state import collect_main_state, collect_training_state, clear_aptitud
 from utils.shared import CleanDefaultDict
 import core.config as config
 from PIL import ImageGrab
-from core.actions import Action
+from core.actions import Action, start_race
 import utils.constants as constants
 from scenarios.unity import unity_cup_function
 from core.events import select_event
@@ -151,17 +151,19 @@ def career_lobby(dry_run_turn=False):
       if matches.get("cancel", False):
         clock_icon = device_action.match_template("assets/icons/clock_icon.png", screenshot=screenshot, threshold=0.9)
         if clock_icon:
-          if config.AUTO_RETRY_RACE:
+          if config.AUTO_RETRY_RACE and race_loss_count < config.MAX_RACE_RETRIES:
             race_loss_count += 1
-            if race_loss_count >= config.MAX_RACE_RETRIES:
-              info(f"Lost {race_loss_count} races in a row, stopping.")
-              device_action.stop_bot(StopReason.RACE_LOSS, f"assets/notifications/{config.ERROR_NOTIFICATION}", volume=config.NOTIFICATION_VOLUME)
-            info(f"Lost race ({race_loss_count}/{config.MAX_RACE_RETRIES}), auto-retrying.")
-            click_match(matches.get("cancel"))
-            non_match_count = 0
+            info(f"Lost race, using alarm clock to retry ({race_loss_count}/{config.MAX_RACE_RETRIES}).")
+            device_action.locate_and_click("assets/buttons/retry_btn.png", min_search_time=get_secs(2))
+            start_race()
           else:
-            debug("Lost race, wait for input.")
-            non_match_count += 1
+            if config.AUTO_RETRY_RACE:
+              info(f"Lost race and reached retry limit ({config.MAX_RACE_RETRIES}), skipping retry.")
+              click_match(matches.get("cancel"))
+              non_match_count = 0
+            else:
+              debug("Lost race, wait for input.")
+              non_match_count += 1
         elif click_match(matches.get("cancel")):
           debug("Pressed cancel.")
           non_match_count = 0
@@ -379,8 +381,7 @@ def career_lobby(dry_run_turn=False):
     return
 
 def record_and_finalize_turn(state_obj, action):
-  global last_state, action_count, race_loss_count
-  race_loss_count = 0
+  global last_state, action_count
   user_info_block(state_obj, last_state, action)
   record_turn(state_obj, last_state, action)
   last_state = state_obj
