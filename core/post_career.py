@@ -3,10 +3,10 @@ import utils.constants as constants
 from utils.tools import sleep, get_secs
 from utils.log import info, warning
 
-# Pixel distance from the left edge of an item row template match to the
+# Pixel distance from the CENTRE of an item row template match to the
 # centre of its "Use" button on the Recover TP screen (energy_2).
-# Measured at 1080p game resolution; update if resolution changes.
-_USE_BTN_OFFSET_X = 260
+# Measured from sample screenshots at 803×1151 emulator resolution.
+_USE_BTN_OFFSET_X = 519
 
 
 def close_career():
@@ -18,9 +18,9 @@ def close_career():
   Screens navigated (see assets/post_career/ for templates):
     end_1  → click Complete Career button
     end_2  → click Finish (confirmation dialog)
-    end_3  → SPARKS list: detect 3★ primary spark, click Next
-    end_4  → Umamusume Details: if 3★, open favourite picker and select carrot icon
-    end_5  → career rank celebration screen, click Next
+    end_3  → Career Rank screen, click Next
+    end_4  → SPARKS list: detect 3★ primary spark, click Next
+    end_5  → Umamusume Details: if 3★, open favourite picker and select carrot icon; click Close
     end_6  → career results screen, click Next
     end_7  → rewards (fans/bond), click Next
     end_8  → rewards (support cards/items), click Next
@@ -44,28 +44,36 @@ def close_career():
   )
   sleep(1)
 
-  # end_3: SPARKS list — detect 3★ primary spark then click Next
+  # end_3: Career Rank screen — click Next
+  device_action.locate_and_click(
+    "assets/buttons/next_btn.png",
+    min_search_time=get_secs(5),
+    text="end_3: Next (Career Rank)"
+  )
+  sleep(1)
+
+  # end_4: SPARKS list — detect 3★ primary spark then click Next
   is_three_star = _check_three_star_spark()
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
     min_search_time=get_secs(5),
-    text="end_3: Next (Sparks)"
+    text="end_4: Next (Sparks)"
   )
   sleep(1)
 
-  # end_4: Umamusume Details — optionally favourite, then close
+  # end_5: Umamusume Details — optionally favourite, then close
   if is_three_star:
     info("3★ primary spark detected — favouriting.")
     _favourite_spark()
   device_action.locate_and_click(
     "assets/post_career/details_close_btn.png",
     min_search_time=get_secs(5),
-    text="end_4: Close (Umamusume Details)"
+    text="end_5: Close (Umamusume Details)"
   )
   sleep(1)
 
-  # end_5–8: four Next buttons (rank celebration, results, rewards x2)
-  for label in ("end_5", "end_6", "end_7", "end_8"):
+  # end_6–8: three Next buttons (career results, rewards/fans, rewards/items)
+  for label in ("end_6", "end_7", "end_8"):
     device_action.locate_and_click(
       "assets/buttons/next_btn.png",
       min_search_time=get_secs(8),
@@ -84,20 +92,25 @@ def close_career():
 
 
 def _check_three_star_spark() -> bool:
-  """Return True if the first row of the SPARKS list shows 3 gold stars."""
-  # Limit the search to the upper portion of the SPARKS list so we only
-  # check the first (primary) spark row and not lower rows.
-  first_row_region = constants.add_tuple_elements(
-    constants.GAME_WINDOW_BBOX, (60, 200, 0, -680)
-  )
-  result = device_action.locate(
-    "assets/post_career/spark_3star.png",
-    min_search_time=get_secs(2),
-    region_ltrb=first_row_region
-  )
-  if result:
-    info("3★ primary spark found.")
-  return result is not None
+  """Return True if the first row of the SPARKS list shows 3 gold stars.
+
+  TODO: capture assets/post_career/spark_3star.png from a run that achieves
+  a 3★ primary spark, then replace the body of this function with the
+  locate() call below:
+
+    first_row_region = constants.add_tuple_elements(
+        constants.GAME_WINDOW_BBOX, (60, 200, 0, -680)
+    )
+    result = device_action.locate(
+        "assets/post_career/spark_3star.png",
+        min_search_time=get_secs(2),
+        region_ltrb=first_row_region,
+    )
+    if result:
+        info("3★ primary spark found.")
+    return result is not None
+  """
+  return False
 
 
 def _favourite_spark():
@@ -253,14 +266,15 @@ def _handle_energy_popup():
   device_action.click(restore_btn, text="energy_1: Restore")
   sleep(1)
 
-  # energy_2: prefer Toughness 30; fall back to Carats
+  # energy_2: prefer Toughness 30; fall back to Carats.
+  # locate() returns (center_x, center_y); add _USE_BTN_OFFSET_X to reach Use button.
   toughness_row = device_action.locate(
     "assets/new_career/toughness_30_row.png",
     min_search_time=get_secs(3)
   )
   if toughness_row:
-    x, y, w, h = toughness_row
-    device_action.click((x + _USE_BTN_OFFSET_X, y + h // 2), text="energy_2: Use Toughness 30")
+    cx, cy = toughness_row
+    device_action.click((cx + _USE_BTN_OFFSET_X, cy), text="energy_2: Use Toughness 30")
   else:
     warning("Toughness 30 not found — using Carats instead.")
     carats_row = device_action.locate(
@@ -268,8 +282,8 @@ def _handle_energy_popup():
       min_search_time=get_secs(3)
     )
     if carats_row:
-      x, y, w, h = carats_row
-      device_action.click((x + _USE_BTN_OFFSET_X, y + h // 2), text="energy_2: Use Carats")
+      cx, cy = carats_row
+      device_action.click((cx + _USE_BTN_OFFSET_X, cy), text="energy_2: Use Carats")
   sleep(1)
 
   # energy_3: confirm the quantity dialog
