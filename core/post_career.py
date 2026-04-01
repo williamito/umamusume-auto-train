@@ -66,7 +66,7 @@ def close_career():
     info("3★ primary spark detected — favouriting.")
     _favourite_spark()
   device_action.locate_and_click(
-    "assets/post_career/details_close_btn.png",
+    "assets/buttons/close_btn.png",
     min_search_time=get_secs(5),
     text="end_5: Close (Umamusume Details)"
   )
