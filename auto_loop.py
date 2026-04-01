@@ -82,11 +82,17 @@ def loop():
     info(f"Config: {config.CONFIG_NAME}")
     career_lobby()
 
-    # career_lobby() returns after BotStopException (for any reason).
-    # Check whether the career actually finished by looking for the button
-    # that is present on screen when a career ends normally.
+    # career_lobby() always returns via BotStopException, which sets
+    # is_bot_running=False. Restore it so screenshots work for the
+    # end-state check below (and for close_career/start_new_career).
+    bot.is_bot_running = True
+
+    # Check whether the career actually finished normally. If the user
+    # pressed F1 to stop mid-career, the button won't be on screen and
+    # we fall through to the bot.is_bot_running=False line below.
     if not device_action.locate("assets/buttons/complete_career_btn.png", min_search_time=1):
       info("Career did not finish normally — stopping loop.")
+      bot.is_bot_running = False
       break
 
     close_career()
