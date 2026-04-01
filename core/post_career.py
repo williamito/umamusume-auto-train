@@ -29,6 +29,7 @@ def close_career():
   info("Closing career...")
 
   # end_1: Complete Career button (already visible when this is called)
+  info("[end_1] Clicking Complete Career...")
   device_action.locate_and_click(
     "assets/buttons/complete_career_btn.png",
     min_search_time=get_secs(3),
@@ -37,6 +38,7 @@ def close_career():
   sleep(1)
 
   # end_2: Confirmation dialog — click Finish
+  info("[end_2] Clicking Finish...")
   device_action.locate_and_click(
     "assets/post_career/finish_btn.png",
     min_search_time=get_secs(5),
@@ -45,6 +47,7 @@ def close_career():
   sleep(1)
 
   # end_3: Career Rank screen — click Next
+  info("[end_3] Career Rank — clicking Next...")
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
     min_search_time=get_secs(5),
@@ -53,6 +56,7 @@ def close_career():
   sleep(1)
 
   # end_4: SPARKS list — detect 3★ primary spark then click Next
+  info("[end_4] Sparks — clicking Next...")
   is_three_star = _check_three_star_spark()
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
@@ -62,6 +66,7 @@ def close_career():
   sleep(1)
 
   # end_5: Umamusume Details — optionally favourite, then close
+  info("[end_5] Umamusume Details — closing...")
   if is_three_star:
     info("3★ primary spark detected — favouriting.")
     _favourite_spark()
@@ -73,7 +78,8 @@ def close_career():
   sleep(1)
 
   # end_6–8: three Next buttons (career results, rewards/fans, rewards/items)
-  for label in ("end_6", "end_7", "end_8"):
+  for label, desc in (("end_6", "Career Results"), ("end_7", "Rewards (fans)"), ("end_8", "Rewards (items)")):
+    info(f"[{label}] {desc} — clicking Next...")
     device_action.locate_and_click(
       "assets/buttons/next_btn.png",
       min_search_time=get_secs(8),
@@ -82,6 +88,7 @@ def close_career():
     sleep(1)
 
   # end_9: Career Complete dialog — To Home
+  info("[end_9] Career Complete — clicking To Home...")
   device_action.locate_and_click(
     "assets/post_career/to_home_btn.png",
     min_search_time=get_secs(8),
@@ -161,6 +168,7 @@ def start_new_career():
   info("Starting new career...")
 
   # start_1: home screen — click CAREER button (centre crop, avoids Event banner)
+  info("[start_1] Clicking Career button...")
   device_action.locate_and_click(
     "assets/new_career/career_btn.png",
     min_search_time=get_secs(10),
@@ -169,6 +177,7 @@ def start_new_career():
   sleep(1)
 
   # start_2: Scenario Select — extra wait; buttons can be slow to become clickable
+  info("[start_2] Scenario Select — clicking Next...")
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
     min_search_time=get_secs(8),
@@ -177,6 +186,7 @@ def start_new_career():
   sleep(1)
 
   # start_3: Trainee Select
+  info("[start_3] Trainee Select — clicking Next...")
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
     min_search_time=get_secs(5),
@@ -185,6 +195,7 @@ def start_new_career():
   sleep(1)
 
   # start_4: Legacy Select
+  info("[start_4] Legacy Select — clicking Next...")
   device_action.locate_and_click(
     "assets/buttons/next_btn.png",
     min_search_time=get_secs(5),
@@ -193,6 +204,7 @@ def start_new_career():
   sleep(1)
 
   # start_5: Support Formation — click the empty Friends slot (green +)
+  info("[start_5] Support Formation — clicking Friends slot...")
   device_action.locate_and_click(
     "assets/new_career/friends_slot.png",
     min_search_time=get_secs(5),
@@ -201,9 +213,7 @@ def start_new_career():
   sleep(1)
 
   # start_6: Borrow Card list — find and click Kitasan Black 4-diamond row.
-  # The template covers the horse name "Kitasan Black" + 4 blue diamond icons
-  # so it uniquely identifies the desired card regardless of trainer name.
-  # Clicking the row auto-closes the dialog and fills the Friends slot.
+  info("[start_6] Borrow Card — selecting Kitasan Black...")
   device_action.locate_and_click(
     "assets/new_career/kitasan_black_card.png",
     min_search_time=get_secs(8),
@@ -213,6 +223,7 @@ def start_new_career():
 
   # start_7: Support Formation (Friends slot now filled) — Start Career!
   # Then check for the optional low-TP popup before proceeding.
+  info("[start_7] Support Formation — clicking Start Career!...")
   device_action.locate_and_click(
     "assets/new_career/start_career_text.png",
     min_search_time=get_secs(5),
@@ -224,6 +235,7 @@ def start_new_career():
   _handle_energy_popup()
 
   # start_8: Final Confirmation dialog — Start Career! (same template)
+  info("[start_8] Confirmation — clicking Start Career!...")
   device_action.locate_and_click(
     "assets/new_career/start_career_text.png",
     min_search_time=get_secs(5),
@@ -232,6 +244,7 @@ def start_new_career():
   sleep(2)
 
   # start_9: Intro movie — click fast-forward (>>|)
+  info("[start_9] Skipping intro...")
   device_action.locate_and_click(
     "assets/buttons/skip_btn.png",
     min_search_time=get_secs(15),
@@ -241,6 +254,7 @@ def start_new_career():
   sleep(1)
 
   # start_10a–c: Quick Mode Settings — cycle to "Skip >>" then Confirm
+  info("[start_10] Setting Quick Mode skip...")
   _set_quick_mode_skip()
 
   info("Career started. Handing off to career loop.")
