@@ -45,8 +45,9 @@ def close_career():
   _click("assets/post_career/finish_btn.png", get_secs(5), "end_2")
   sleep(1)
 
+  # Career Rank has a long entrance animation; wait up to 25s for Next to appear.
   info("[end_3] Career Rank — clicking Next...")
-  _click("assets/buttons/next_btn.png", get_secs(5), "end_3")
+  _click("assets/buttons/next_btn.png", get_secs(25), "end_3")
   sleep(1)
 
   info("[end_4] Sparks — clicking Next...")
