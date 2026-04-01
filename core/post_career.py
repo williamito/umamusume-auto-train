@@ -9,6 +9,14 @@ from utils.log import info, warning
 _USE_BTN_OFFSET_X = 519
 
 
+def _click(template, timeout, label):
+  """locate_and_click with a warning logged on failure."""
+  ok = device_action.locate_and_click(template, min_search_time=timeout, text=label)
+  if not ok:
+    warning(f"[{label}] Template not found: {template}")
+  return ok
+
+
 def close_career():
   """Navigate all post-career screens after career_lobby() returns.
 
@@ -30,70 +38,36 @@ def close_career():
 
   # end_1: Complete Career button (already visible when this is called)
   info("[end_1] Clicking Complete Career...")
-  device_action.locate_and_click(
-    "assets/buttons/complete_career_btn.png",
-    min_search_time=get_secs(3),
-    text="end_1: Complete Career"
-  )
+  _click("assets/buttons/complete_career_btn.png", get_secs(3), "end_1")
   sleep(1)
 
-  # end_2: Confirmation dialog — click Finish
   info("[end_2] Clicking Finish...")
-  device_action.locate_and_click(
-    "assets/post_career/finish_btn.png",
-    min_search_time=get_secs(5),
-    text="end_2: Finish"
-  )
+  _click("assets/post_career/finish_btn.png", get_secs(5), "end_2")
   sleep(1)
 
-  # end_3: Career Rank screen — click Next
   info("[end_3] Career Rank — clicking Next...")
-  device_action.locate_and_click(
-    "assets/buttons/next_btn.png",
-    min_search_time=get_secs(5),
-    text="end_3: Next (Career Rank)"
-  )
+  _click("assets/buttons/next_btn.png", get_secs(5), "end_3")
   sleep(1)
 
-  # end_4: SPARKS list — detect 3★ primary spark then click Next
   info("[end_4] Sparks — clicking Next...")
   is_three_star = _check_three_star_spark()
-  device_action.locate_and_click(
-    "assets/buttons/next_btn.png",
-    min_search_time=get_secs(5),
-    text="end_4: Next (Sparks)"
-  )
+  _click("assets/buttons/next_btn.png", get_secs(5), "end_4")
   sleep(1)
 
-  # end_5: Umamusume Details — optionally favourite, then close
   info("[end_5] Umamusume Details — closing...")
   if is_three_star:
     info("3★ primary spark detected — favouriting.")
     _favourite_spark()
-  device_action.locate_and_click(
-    "assets/buttons/close_btn.png",
-    min_search_time=get_secs(5),
-    text="end_5: Close (Umamusume Details)"
-  )
+  _click("assets/buttons/close_btn.png", get_secs(5), "end_5")
   sleep(1)
 
-  # end_6–8: three Next buttons (career results, rewards/fans, rewards/items)
   for label, desc in (("end_6", "Career Results"), ("end_7", "Rewards (fans)"), ("end_8", "Rewards (items)")):
     info(f"[{label}] {desc} — clicking Next...")
-    device_action.locate_and_click(
-      "assets/buttons/next_btn.png",
-      min_search_time=get_secs(8),
-      text=f"{label}: Next"
-    )
+    _click("assets/buttons/next_btn.png", get_secs(8), label)
     sleep(1)
 
-  # end_9: Career Complete dialog — To Home
   info("[end_9] Career Complete — clicking To Home...")
-  device_action.locate_and_click(
-    "assets/post_career/to_home_btn.png",
-    min_search_time=get_secs(8),
-    text="end_9: To Home"
-  )
+  _click("assets/post_career/to_home_btn.png", get_secs(8), "end_9")
   sleep(2)
   info("Career closed. Returned to home.")
 
@@ -167,93 +141,51 @@ def start_new_career():
   """
   info("Starting new career...")
 
-  # start_1: home screen — click CAREER button (centre crop, avoids Event banner)
   info("[start_1] Clicking Career button...")
-  device_action.locate_and_click(
-    "assets/new_career/career_btn.png",
-    min_search_time=get_secs(10),
-    text="start_1: Career"
-  )
+  _click("assets/new_career/career_btn.png", get_secs(10), "start_1")
   sleep(1)
 
-  # start_2: Scenario Select — extra wait; buttons can be slow to become clickable
   info("[start_2] Scenario Select — clicking Next...")
-  device_action.locate_and_click(
-    "assets/buttons/next_btn.png",
-    min_search_time=get_secs(8),
-    text="start_2: Next (Scenario Select)"
-  )
+  _click("assets/buttons/next_btn.png", get_secs(8), "start_2")
   sleep(1)
 
-  # start_3: Trainee Select
   info("[start_3] Trainee Select — clicking Next...")
-  device_action.locate_and_click(
-    "assets/buttons/next_btn.png",
-    min_search_time=get_secs(5),
-    text="start_3: Next (Trainee Select)"
-  )
+  _click("assets/buttons/next_btn.png", get_secs(5), "start_3")
   sleep(1)
 
-  # start_4: Legacy Select
   info("[start_4] Legacy Select — clicking Next...")
-  device_action.locate_and_click(
-    "assets/buttons/next_btn.png",
-    min_search_time=get_secs(5),
-    text="start_4: Next (Legacy Select)"
-  )
+  _click("assets/buttons/next_btn.png", get_secs(5), "start_4")
   sleep(1)
 
-  # start_5: Support Formation — click the empty Friends slot (green +)
   info("[start_5] Support Formation — clicking Friends slot...")
-  device_action.locate_and_click(
-    "assets/new_career/friends_slot.png",
-    min_search_time=get_secs(5),
-    text="start_5: Friends slot"
-  )
+  _click("assets/new_career/friends_slot.png", get_secs(5), "start_5")
   sleep(1)
 
-  # start_6: Borrow Card list — find and click Kitasan Black 4-diamond row.
   info("[start_6] Borrow Card — selecting Kitasan Black...")
-  device_action.locate_and_click(
-    "assets/new_career/kitasan_black_card.png",
-    min_search_time=get_secs(8),
-    text="start_6: Kitasan Black card"
-  )
+  _click("assets/new_career/kitasan_black_card.png", get_secs(8), "start_6")
   sleep(1)
 
-  # start_7: Support Formation (Friends slot now filled) — Start Career!
-  # Then check for the optional low-TP popup before proceeding.
   info("[start_7] Support Formation — clicking Start Career!...")
-  device_action.locate_and_click(
-    "assets/new_career/start_career_text.png",
-    min_search_time=get_secs(5),
-    text="start_7: Start Career!"
-  )
+  _click("assets/new_career/start_career_text.png", get_secs(5), "start_7")
   sleep(1)
 
-  # Handle low-TP popup if it appears (energy_1–4)
   _handle_energy_popup()
 
-  # start_8: Final Confirmation dialog — Start Career! (same template)
   info("[start_8] Confirmation — clicking Start Career!...")
-  device_action.locate_and_click(
-    "assets/new_career/start_career_text.png",
-    min_search_time=get_secs(5),
-    text="start_8: Start Career! (confirmation)"
-  )
+  _click("assets/new_career/start_career_text.png", get_secs(5), "start_8")
   sleep(2)
 
-  # start_9: Intro movie — click fast-forward (>>|)
   info("[start_9] Skipping intro...")
-  device_action.locate_and_click(
+  ok = device_action.locate_and_click(
     "assets/buttons/skip_btn.png",
     min_search_time=get_secs(15),
     region_ltrb=constants.SCREEN_BOTTOM_BBOX,
-    text="start_9: fast-forward intro"
+    text="start_9"
   )
+  if not ok:
+    warning("[start_9] Template not found: assets/buttons/skip_btn.png")
   sleep(1)
 
-  # start_10a–c: Quick Mode Settings — cycle to "Skip >>" then Confirm
   info("[start_10] Setting Quick Mode skip...")
   _set_quick_mode_skip()
 
