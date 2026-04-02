@@ -182,15 +182,12 @@ def start_new_career():
   sleep(1)
 
   info("[start_5] Support Formation — clicking Friends slot...")
-  slot_found = _click("assets/new_career/friends_slot.png", get_secs(5), "start_5")
+  _click("assets/new_career/friends_slot.png", get_secs(5), "start_5")
   sleep(1)
 
-  if slot_found:
-    info("[start_6] Borrow Card — selecting Kitasan Black...")
-    _click("assets/new_career/kitasan_black_card.png", get_secs(8), "start_6")
-    sleep(1)
-  else:
-    info("[start_5] Friends slot already filled — skipping start_6 (borrow card).")
+  info("[start_6] Borrow Card — selecting Kitasan Black...")
+  _click("assets/new_career/kitasan_black_card.png", get_secs(8), "start_6")
+  sleep(1)
 
   info("[start_7] Support Formation — clicking Start Career!...")
   _click("assets/new_career/start_career_text.png", get_secs(5), "start_7")
