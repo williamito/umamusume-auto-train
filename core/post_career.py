@@ -75,7 +75,7 @@ def close_career():
     sleep(1)
 
   info("[end_9] Career Complete — clicking To Home...")
-  _click("assets/post_career/to_home_btn.png", get_secs(8), "end_9", _SAMPLE_SCALE)
+  _click("assets/post_career/to_home_btn.png", get_secs(15), "end_9", _SAMPLE_SCALE)
   sleep(2)
   info("Career closed. Returned to home.")
 
