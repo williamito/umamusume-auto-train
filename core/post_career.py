@@ -171,15 +171,15 @@ def start_new_career():
 
   info("[start_2] Scenario Select — clicking Next...")
   _click("assets/buttons/next_btn.png", get_secs(8), "start_2")
-  sleep(1)
+  sleep(2)
 
   info("[start_3] Trainee Select — clicking Next...")
   _click("assets/buttons/next_btn.png", get_secs(5), "start_3")
-  sleep(1)
+  sleep(2)
 
   info("[start_4] Legacy Select — clicking Next...")
   _click("assets/buttons/next_btn.png", get_secs(5), "start_4")
-  sleep(1)
+  sleep(2)
 
   info("[start_5] Support Formation — clicking Friends slot...")
   _click("assets/new_career/friends_slot.png", get_secs(5), "start_5")

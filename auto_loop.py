@@ -102,7 +102,32 @@ def loop():
   info("Auto-loop stopped.")
 
 
+def run_start_career_only():
+  """Run just start_new_career() for testing; mirrors the setup in loop()."""
+  config.reload_config()
+  if args.use_adb:
+    bot.use_adb = True
+    bot.device_id = args.use_adb
+  else:
+    bot.use_adb = config.USE_ADB
+    if config.DEVICE_ID and config.DEVICE_ID != "":
+      bot.device_id = config.DEVICE_ID
+  if not focus_umamusume():
+    error("Failed to focus Umamusume window")
+    return
+  bot.is_bot_running = True
+  try:
+    start_new_career()
+  finally:
+    bot.is_bot_running = False
+
+
 def hotkey_listener():
+  # ctrl+<hotkey> runs only start_new_career() for testing the start flow.
+  keyboard.add_hotkey(f"ctrl+{bot.hotkey}", lambda: threading.Thread(
+    target=run_start_career_only, daemon=True
+  ).start())
+
   while True:
     keyboard.wait(bot.hotkey)
     if not bot.is_bot_running:
@@ -142,7 +167,7 @@ def start_server():
   server_config = uvicorn.Config(app, host=host, port=port, workers=1, log_level="warning")
   server = uvicorn.Server(server_config)
   init_logging()
-  info(f"Press '{bot.hotkey}' to start/stop the auto-loop.")
+  info(f"Press '{bot.hotkey}' to start/stop the auto-loop. Press 'ctrl+{bot.hotkey}' to test start_new_career() only.")
   info(f"[SERVER] Open http://{host}:{port} to configure the bot.")
   server.run()
 
