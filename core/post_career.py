@@ -9,9 +9,16 @@ from utils.log import info, warning
 _USE_BTN_OFFSET_X = 519
 
 
-def _click(template, timeout, label):
+# Templates extracted from emulator samples (~768px game width) need a small
+# upscale to match the bot's 800px capture window.
+_SAMPLE_SCALE = 800 / 768  # ≈ 1.042
+
+
+def _click(template, timeout, label, scaling=1.0):
   """locate_and_click with a warning logged on failure."""
-  ok = device_action.locate_and_click(template, min_search_time=timeout, text=label)
+  ok = device_action.locate_and_click(
+    template, min_search_time=timeout, text=label, template_scaling=scaling
+  )
   if not ok:
     warning(f"[{label}] Template not found: {template}")
   return ok
@@ -68,7 +75,7 @@ def close_career():
     sleep(1)
 
   info("[end_9] Career Complete — clicking To Home...")
-  _click("assets/post_career/to_home_btn.png", get_secs(8), "end_9")
+  _click("assets/post_career/to_home_btn.png", get_secs(8), "end_9", _SAMPLE_SCALE)
   sleep(2)
   info("Career closed. Returned to home.")
 
@@ -159,21 +166,21 @@ def start_new_career():
   sleep(1)
 
   info("[start_5] Support Formation — clicking Friends slot...")
-  _click("assets/new_career/friends_slot.png", get_secs(5), "start_5")
+  _click("assets/new_career/friends_slot.png", get_secs(5), "start_5", _SAMPLE_SCALE)
   sleep(1)
 
   info("[start_6] Borrow Card — selecting Kitasan Black...")
-  _click("assets/new_career/kitasan_black_card.png", get_secs(8), "start_6")
+  _click("assets/new_career/kitasan_black_card.png", get_secs(8), "start_6", _SAMPLE_SCALE)
   sleep(1)
 
   info("[start_7] Support Formation — clicking Start Career!...")
-  _click("assets/new_career/start_career_text.png", get_secs(5), "start_7")
+  _click("assets/new_career/start_career_text.png", get_secs(5), "start_7", _SAMPLE_SCALE)
   sleep(1)
 
   _handle_energy_popup()
 
   info("[start_8] Confirmation — clicking Start Career!...")
-  _click("assets/new_career/start_career_text.png", get_secs(5), "start_8")
+  _click("assets/new_career/start_career_text.png", get_secs(5), "start_8", _SAMPLE_SCALE)
   sleep(2)
 
   info("[start_9] Skipping intro...")
@@ -204,7 +211,8 @@ def _handle_energy_popup():
   """
   restore_btn = device_action.locate(
     "assets/new_career/restore_btn.png",
-    min_search_time=get_secs(2)
+    min_search_time=get_secs(2),
+    template_scaling=_SAMPLE_SCALE
   )
   if not restore_btn:
     return
@@ -217,7 +225,8 @@ def _handle_energy_popup():
   # locate() returns (center_x, center_y); add _USE_BTN_OFFSET_X to reach Use button.
   toughness_row = device_action.locate(
     "assets/new_career/toughness_30_row.png",
-    min_search_time=get_secs(3)
+    min_search_time=get_secs(3),
+    template_scaling=_SAMPLE_SCALE
   )
   if toughness_row:
     cx, cy = toughness_row
@@ -226,7 +235,8 @@ def _handle_energy_popup():
     warning("Toughness 30 not found — using Carats instead.")
     carats_row = device_action.locate(
       "assets/new_career/carats_row.png",
-      min_search_time=get_secs(3)
+      min_search_time=get_secs(3),
+      template_scaling=_SAMPLE_SCALE
     )
     if carats_row:
       cx, cy = carats_row
