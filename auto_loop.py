@@ -120,6 +120,7 @@ def run_start_career_only():
   bot.is_bot_running = True
   try:
     start_new_career()
+    career_lobby()
   finally:
     bot.is_bot_running = False
 
