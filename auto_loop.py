@@ -56,6 +56,7 @@ import core.bot as bot
 import utils.device_action_wrapper as device_action
 from server.main import app
 from update_config import update_config
+from utils.adb_actions import init_adb
 from utils.notifications import on_started
 
 # Re-use focus_umamusume from main without importing main's __main__ block
@@ -115,6 +116,7 @@ def run_start_career_only():
   if not focus_umamusume():
     error("Failed to focus Umamusume window")
     return
+  init_adb()
   bot.is_bot_running = True
   try:
     start_new_career()
