@@ -74,6 +74,7 @@
     "Finale Underway Finals"
   ],
   "use_skip_claw_machine": false,
+  "auto_loop_refill_energy": false,
   "scenario_gimmick_weight": 1.0,
   "race_schedule": [
     {
