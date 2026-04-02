@@ -69,7 +69,6 @@ def reload_config():
     load_var('HINT_HUNTING_WEIGHTS', config["hint_hunting_weights"])
     load_var('SCENARIO_GIMMICK_WEIGHT', config["scenario_gimmick_weight"])
     load_var('USE_SKIP_CLAW_MACHINE', config["use_skip_claw_machine"])
-    load_var('AUTO_LOOP_REFILL_ENERGY', config.get("auto_loop_refill_energy", False))
     load_var('STOP_AT_TURNS', config["stop_at_turns"])
       
   except KeyError as e:

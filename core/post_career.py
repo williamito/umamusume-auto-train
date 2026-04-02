@@ -2,9 +2,12 @@ import cv2
 import os
 import utils.device_action_wrapper as device_action
 import utils.constants as constants
-import core.config as config
 from utils.tools import sleep, get_secs
 from utils.log import info, warning
+
+# Set to True to automatically refill TP when the low-energy popup appears
+# before a new career. False (default) stops the loop so you can refill manually.
+REFILL_ENERGY = False
 
 # Pixel distance from the CENTRE of an item row template match to the
 # centre of its "Use" button on the Recover TP screen (energy_2).
@@ -238,8 +241,8 @@ def _handle_energy_popup():
   if not restore_btn:
     return
 
-  if not config.AUTO_LOOP_REFILL_ENERGY:
-    info("Low-TP popup detected — stopping loop (auto_loop_refill_energy is disabled).")
+  if not REFILL_ENERGY:
+    info("Low-TP popup detected — stopping loop (REFILL_ENERGY is disabled).")
     device_action.stop_bot()
     return
 
