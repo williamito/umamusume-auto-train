@@ -2,6 +2,7 @@ import cv2
 import os
 import utils.device_action_wrapper as device_action
 import utils.constants as constants
+import core.config as config
 from utils.tools import sleep, get_secs
 from utils.log import info, warning
 
@@ -219,7 +220,11 @@ def start_new_career():
 def _handle_energy_popup():
   """Handle the optional low-TP restore popup (energy_1–4).
 
-  If the popup is absent this returns immediately. If present:
+  If AUTO_LOOP_REFILL_ENERGY is False (default), stop the loop when the
+  popup appears so the user can refill manually.
+
+  If the popup is absent this returns immediately. If present and the flag
+  is True:
     energy_1: click Restore
     energy_2: use Toughness 30 if available, otherwise Carats
     energy_3: confirm OK
@@ -231,6 +236,11 @@ def _handle_energy_popup():
     template_scaling=_SAMPLE_SCALE
   )
   if not restore_btn:
+    return
+
+  if not config.AUTO_LOOP_REFILL_ENERGY:
+    info("Low-TP popup detected — stopping loop (auto_loop_refill_energy is disabled).")
+    device_action.stop_bot()
     return
 
   info("Low-TP popup detected — restoring TP.")
