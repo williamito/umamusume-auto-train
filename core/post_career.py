@@ -167,7 +167,7 @@ def start_new_career():
 
   info("[start_1] Clicking Career button...")
   _click("assets/new_career/career_btn.png", get_secs(10), "start_1")
-  sleep(1)
+  sleep(3)
 
   info("[start_2] Scenario Select — clicking Next...")
   _click("assets/buttons/next_btn.png", get_secs(8), "start_2")
