@@ -1,0 +1,73 @@
+{
+  "route": "triple_tiara",
+  "description": "Triple Tiara route — Oka Sho, Japanese Oaks, Shuka Sho. Speed+Wit deck, ~32 races, mile+medium focus.",
+
+  "triple_tiara": [
+    {
+      "name": "Oka Sho",
+      "year": "Classic Year",
+      "date": "Early Apr",
+      "grade": "G1",
+      "distance": "Mile",
+      "meters": 1600,
+      "mandatory": true
+    },
+    {
+      "name": "Japanese Oaks",
+      "year": "Classic Year",
+      "date": "Late May",
+      "grade": "G1",
+      "distance": "Medium",
+      "meters": 2400,
+      "mandatory": true
+    },
+    {
+      "name": "Shuka Sho",
+      "year": "Classic Year",
+      "date": "Late Oct",
+      "grade": "G1",
+      "distance": "Medium",
+      "meters": 2000,
+      "mandatory": true
+    }
+  ],
+
+  "schedule": {
+    "Junior Year": {
+      "gp_target": 60,
+      "races": [
+        {"name": "Saudi Arabia Royal Cup", "date": "Early Oct", "grade": "G3", "distance": "Mile"},
+        {"name": "Artemis Stakes", "date": "Late Oct", "grade": "G3", "distance": "Mile"},
+        {"name": "Hanshin Juvenile Fillies", "date": "Early Dec", "grade": "G1", "distance": "Mile"},
+        {"name": "Hopeful Stakes", "date": "Late Dec", "grade": "G1", "distance": "Medium"}
+      ]
+    },
+    "Classic Year": {
+      "gp_target": 300,
+      "races": [
+        {"name": "Tulip Sho", "date": "Early Mar", "grade": "G2", "distance": "Mile"},
+        {"name": "Oka Sho", "date": "Early Apr", "grade": "G1", "distance": "Mile", "tiara": true},
+        {"name": "NHK Mile Cup", "date": "Early May", "grade": "G1", "distance": "Mile"},
+        {"name": "Japanese Oaks", "date": "Late May", "grade": "G1", "distance": "Medium", "tiara": true},
+        {"name": "Yasuda Kinen", "date": "Early Jun", "grade": "G1", "distance": "Mile"},
+        {"name": "Rose Stakes", "date": "Late Sep", "grade": "G2", "distance": "Medium"},
+        {"name": "Shuka Sho", "date": "Late Oct", "grade": "G1", "distance": "Medium", "tiara": true},
+        {"name": "Mile Championship", "date": "Late Nov", "grade": "G1", "distance": "Mile"},
+        {"name": "Arima Kinen", "date": "Late Dec", "grade": "G1", "distance": "Long"}
+      ]
+    },
+    "Senior Year": {
+      "gp_target": 300,
+      "races": [
+        {"name": "Osaka Hai", "date": "Late Mar", "grade": "G1", "distance": "Medium"},
+        {"name": "Victoria Mile", "date": "Early May", "grade": "G1", "distance": "Mile"},
+        {"name": "Yasuda Kinen", "date": "Early Jun", "grade": "G1", "distance": "Mile"},
+        {"name": "Takarazuka Kinen", "date": "Late Jun", "grade": "G1", "distance": "Medium"},
+        {"name": "Mainichi Okan", "date": "Early Oct", "grade": "G2", "distance": "Mile"},
+        {"name": "Tenno Sho Autumn", "date": "Late Oct", "grade": "G1", "distance": "Medium"},
+        {"name": "Mile Championship", "date": "Late Nov", "grade": "G1", "distance": "Mile"},
+        {"name": "Arima Kinen", "date": "Late Dec", "grade": "G1", "distance": "Long"}
+      ]
+    }
+  }
+}
