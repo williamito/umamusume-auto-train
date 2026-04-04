@@ -1,3 +1,21 @@
+"""
+AUTO-LOOP FEATURE - DEVELOPMENT CONSTRAINT
+
+This feature lives on the feature/auto-loop branch and must maintain clean
+separation from core infrastructure code to facilitate easy merging of upstream
+changes from unity_cup_beta.
+
+RULE: Do NOT modify core files (core/config.py, core/skeleton.py, etc.) or
+shared infrastructure (utils/*, server/main.py, config.template.json) for
+auto-loop functionality. All auto-loop logic must live in:
+  - auto_loop.py (this harness/wrapper)
+  - core/post_career.py (new file, auto-loop only)
+  - assets/ (templates and images)
+
+If you need a flag/setting, add it as a module-level constant in post_career.py,
+not in config.json or core/config.py.
+"""
+
 import sys
 import subprocess
 import warnings
