@@ -1,0 +1,26 @@
+# Auto-Loop Feature Development Constraints
+
+## CRITICAL REQUIREMENT: No Core Code Changes
+
+The auto-loop feature (branch `feature/auto-loop`) must maintain **clean separation** from core infrastructure to facilitate easy merging of upstream changes from `unity_cup_beta`.
+
+### What You Can Modify
+- `auto_loop.py` — harness/wrapper only
+- `core/post_career.py` — new file, auto-loop only
+- `assets/new_career/` and `assets/post_career/` — templates/images
+- Documentation comments in these files
+
+### What You Must NOT Modify
+- `core/config.py` — shared config infrastructure
+- `core/skeleton.py` — core career loop
+- `utils/` — shared utilities
+- `server/main.py` — shared server
+- `config.template.json` and `config.json` — shared config
+
+### Flags & Settings
+If you need to add a feature flag or setting:
+- Add it as a **module-level constant** in `core/post_career.py` (e.g., `REFILL_ENERGY = False`)
+- Do NOT touch `config.json`, `config.template.json`, or `core/config.py`
+- Constants can be toggled by editing `post_career.py` directly
+
+This constraint ensures the branch can pull upstream changes cleanly without conflicts.
