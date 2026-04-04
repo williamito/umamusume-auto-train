@@ -11,6 +11,7 @@ import math
 import utils.device_action_wrapper as device_action
 import utils.constants as constants
 from core.actions import Action, start_race, click_race_buttons
+from core.ocr import extract_text
 from utils.log import debug, info, warning, error
 from utils.tools import sleep, get_secs
 
@@ -197,26 +198,38 @@ def _open_and_buy(state, available_coins):
         if item_name == "grilled_carrots" and "Junior" not in year:
             continue
 
-        # Try to find and buy the item
-        item_template = tb_constants.ITEM_TEMPLATES.get(item_name, "")
-        if not item_template or not os.path.exists(item_template):
-            debug(f"[TB] Template for {item_name} not found, skipping")
+        # Try to find the item — either via OCR text or template matching
+        found = False
+
+        # Method 1: OCR text matching (for scrolls and manuals with color variants)
+        ocr_keyword = tb_constants.ITEM_OCR_KEYWORDS.get(item_name)
+        if ocr_keyword:
+            found = _find_and_click_item_by_text(ocr_keyword)
+
+        # Method 2: Template matching (for items with unique icons)
+        if not found:
+            item_template = tb_constants.ITEM_TEMPLATES.get(item_name, "")
+            if item_template and os.path.exists(item_template):
+                if device_action.locate_and_click(item_template, min_search_time=get_secs(1)):
+                    found = True
+
+        if not found:
+            debug(f"[TB] Could not find {item_name} in shop")
             continue
 
-        if device_action.locate_and_click(item_template, min_search_time=get_secs(1)):
-            sleep(0.5)
-            # Click buy button
-            buy_btn_path = tb_constants.TEMPLATES.get("buy_btn", "")
-            if buy_btn_path and os.path.exists(buy_btn_path):
-                if device_action.locate_and_click(buy_btn_path, min_search_time=get_secs(1)):
-                    sleep(0.5)
-                    # Confirm purchase
-                    device_action.locate_and_click("assets/buttons/ok_btn.png", min_search_time=get_secs(1))
-                    sleep(0.5)
+        sleep(0.5)
+        # Click buy button
+        buy_btn_path = tb_constants.TEMPLATES.get("buy_btn", "")
+        if buy_btn_path and os.path.exists(buy_btn_path):
+            if device_action.locate_and_click(buy_btn_path, min_search_time=get_secs(1)):
+                sleep(0.5)
+                # Confirm purchase
+                device_action.locate_and_click("assets/buttons/ok_btn.png", min_search_time=get_secs(1))
+                sleep(0.5)
 
-                    record_item_bought(item_name)
-                    available_coins -= cost
-                    info(f"[TB] Bought {item_name} (cost={cost}, remaining={available_coins})")
+                record_item_bought(item_name)
+                available_coins -= cost
+                info(f"[TB] Bought {item_name} (cost={cost}, remaining={available_coins})")
 
     # Close shop
     device_action.locate_and_click("assets/buttons/back_btn.png", min_search_time=get_secs(1))
@@ -394,6 +407,38 @@ def check_gp_deficit_race(state, action):
 # ============================================================================
 # HELPERS
 # ============================================================================
+
+def _find_and_click_item_by_text(keyword):
+    """
+    Find a shop item by OCR text matching and click it.
+    Scans the shop screen for text containing the keyword (case-insensitive).
+    Used for items like scrolls and manuals that have multiple color variants
+    but share the same label text.
+
+    Returns True if found and clicked, False otherwise.
+    """
+    from core.ocr import get_reader
+
+    screenshot = device_action.screenshot(region_ltrb=constants.GAME_WINDOW_BBOX)
+    import numpy as np
+    img_np = np.array(screenshot)
+
+    reader = get_reader()
+    results = reader.readtext(img_np, allowlist="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ")
+
+    for bbox, text, confidence in results:
+        if keyword.lower() in text.lower():
+            # bbox is [[x1,y1],[x2,y1],[x2,y2],[x1,y2]]
+            # Click the center of the detected text region
+            x_center = int((bbox[0][0] + bbox[2][0]) / 2) + constants.GAME_WINDOW_BBOX[0]
+            y_center = int((bbox[0][1] + bbox[2][1]) / 2) + constants.GAME_WINDOW_BBOX[1]
+            debug(f"[TB] Found '{keyword}' in text '{text}' at ({x_center}, {y_center})")
+            device_action.click(target=(x_center, y_center))
+            return True
+
+    debug(f"[TB] OCR text '{keyword}' not found in shop")
+    return False
+
 
 def _estimate_coins(state):
     """

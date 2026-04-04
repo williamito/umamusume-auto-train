@@ -147,15 +147,24 @@ TEMPLATES = {
     "inventory_btn": f"{ASSET_DIR}/inventory_btn.png",
 }
 
-# Item template images for shop identification
+# Item template images for shop identification (icon-based matching)
+# Used for items with a single unique icon. For items with multiple color
+# variants (scrolls, manuals), use OCR text matching instead — see ITEM_OCR_KEYWORDS.
 ITEM_TEMPLATES = {
-    "stat_scroll": f"{ASSET_DIR}/item_scroll.png",
-    "manual": f"{ASSET_DIR}/item_manual.png",
     "kale_juice": f"{ASSET_DIR}/item_kale.png",
     "cupcake": f"{ASSET_DIR}/item_cupcake.png",
     "grilled_carrots": f"{ASSET_DIR}/item_carrots.png",
     "scholars_hat": f"{ASSET_DIR}/item_hat.png",
     "vita_drink": f"{ASSET_DIR}/item_vita.png",
+}
+
+# OCR text keywords for shop items — matched against item name text in the shop listing.
+# Scrolls and manuals come in 5 color variants (one per stat) but all share the same
+# label text, so OCR matching is more robust than trying to template-match each variant.
+# Keys are item names (matching ITEM_PRIORITY), values are lowercase substrings to match.
+ITEM_OCR_KEYWORDS = {
+    "stat_scroll": "scroll",
+    "manual": "manual",
 }
 
 # ---------------------------------------------------------------------------
