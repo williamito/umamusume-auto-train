@@ -11,7 +11,6 @@ import math
 import utils.device_action_wrapper as device_action
 import utils.constants as constants
 from core.actions import Action, start_race, click_race_buttons
-from core.ocr import extract_text
 from utils.log import debug, info, warning, error
 from utils.tools import sleep, get_secs
 
@@ -198,15 +197,20 @@ def _open_and_buy(state, available_coins):
         if item_name == "grilled_carrots" and "Junior" not in year:
             continue
 
-        # Try to find the item — either via OCR text or template matching
+        # Try to find the item via template matching.
+        # Two template sources:
+        #   1. Text label templates (for scrolls/manuals with color variants)
+        #      — screenshot of the non-greyed text; won't match already-bought greyed items
+        #   2. Icon templates (for items with a single unique icon)
         found = False
 
-        # Method 1: OCR text matching (for scrolls and manuals with color variants)
-        ocr_keyword = tb_constants.ITEM_OCR_KEYWORDS.get(item_name)
-        if ocr_keyword:
-            found = _find_and_click_item_by_text(ocr_keyword)
+        # Check text label templates first (scrolls, manuals)
+        text_template = tb_constants.ITEM_TEXT_TEMPLATES.get(item_name, "")
+        if text_template and os.path.exists(text_template):
+            if device_action.locate_and_click(text_template, min_search_time=get_secs(1)):
+                found = True
 
-        # Method 2: Template matching (for items with unique icons)
+        # Then check icon templates (kale juice, cupcake, etc.)
         if not found:
             item_template = tb_constants.ITEM_TEMPLATES.get(item_name, "")
             if item_template and os.path.exists(item_template):
@@ -407,38 +411,6 @@ def check_gp_deficit_race(state, action):
 # ============================================================================
 # HELPERS
 # ============================================================================
-
-def _find_and_click_item_by_text(keyword):
-    """
-    Find a shop item by OCR text matching and click it.
-    Scans the shop screen for text containing the keyword (case-insensitive).
-    Used for items like scrolls and manuals that have multiple color variants
-    but share the same label text.
-
-    Returns True if found and clicked, False otherwise.
-    """
-    from core.ocr import get_reader
-
-    screenshot = device_action.screenshot(region_ltrb=constants.GAME_WINDOW_BBOX)
-    import numpy as np
-    img_np = np.array(screenshot)
-
-    reader = get_reader()
-    results = reader.readtext(img_np, allowlist="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ")
-
-    for bbox, text, confidence in results:
-        if keyword.lower() in text.lower():
-            # bbox is [[x1,y1],[x2,y1],[x2,y2],[x1,y2]]
-            # Click the center of the detected text region
-            x_center = int((bbox[0][0] + bbox[2][0]) / 2) + constants.GAME_WINDOW_BBOX[0]
-            y_center = int((bbox[0][1] + bbox[2][1]) / 2) + constants.GAME_WINDOW_BBOX[1]
-            debug(f"[TB] Found '{keyword}' in text '{text}' at ({x_center}, {y_center})")
-            device_action.click(target=(x_center, y_center))
-            return True
-
-    debug(f"[TB] OCR text '{keyword}' not found in shop")
-    return False
-
 
 def _estimate_coins(state):
     """

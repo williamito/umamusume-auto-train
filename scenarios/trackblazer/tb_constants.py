@@ -158,13 +158,12 @@ ITEM_TEMPLATES = {
     "vita_drink": f"{ASSET_DIR}/item_vita.png",
 }
 
-# OCR text keywords for shop items — matched against item name text in the shop listing.
-# Scrolls and manuals come in 5 color variants (one per stat) but all share the same
-# label text, so OCR matching is more robust than trying to template-match each variant.
-# Keys are item names (matching ITEM_PRIORITY), values are lowercase substrings to match.
-ITEM_OCR_KEYWORDS = {
-    "stat_scroll": "scroll",
-    "manual": "manual",
+# Text label templates for items with multiple color variants (scrolls, manuals).
+# These are screenshots of the item's text label in its normal (non-greyed) color.
+# Already-bought items appear greyed out, so the colored text template won't match them.
+ITEM_TEXT_TEMPLATES = {
+    "stat_scroll": f"{ASSET_DIR}/text_scroll.png",
+    "manual": f"{ASSET_DIR}/text_manual.png",
 }
 
 # ---------------------------------------------------------------------------
