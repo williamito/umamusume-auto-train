@@ -110,14 +110,6 @@ def _advance_to_home(max_iter=25):
       info("[advance] Home screen detected.")
       return
 
-    # Tap a neutral area to accelerate any slow entrance animation.
-    device_action.click(
-      target=constants.SAFE_SPACE_MOUSE_POS,
-      clicks=3,
-      interval=0.2,
-      text="advance: tap to skip animation"
-    )
-
     if device_action.locate_and_click(
       "assets/buttons/next_btn.png",
       min_search_time=get_secs(2),
@@ -135,8 +127,15 @@ def _advance_to_home(max_iter=25):
       sleep(2)
       continue
 
-    warning(f"[advance] No button found on iteration {i + 1}/{max_iter}")
-    sleep(1)
+    # No button visible yet — animation still playing. Tap to advance it,
+    # then immediately loop back and search again (no extra sleep).
+    info(f"[advance] Waiting for button (iteration {i + 1}), tapping to advance animation...")
+    device_action.click(
+      target=constants.SAFE_SPACE_MOUSE_POS,
+      clicks=5,
+      interval=0.2,
+      text="advance: tap to advance animation"
+    )
 
   warning("[advance] Reached max iterations without detecting home screen.")
 
