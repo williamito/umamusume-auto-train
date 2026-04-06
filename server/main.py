@@ -144,6 +144,7 @@ def get_min_scores():
 def update_webhook(data: dict):
   config.WEBHOOK_URL = data.get("webhook_url", "")
   config.WEBHOOK_PROGRESS_ENABLED = data.get("webhook_progress_enabled", True)
+  config.WEBHOOK_SKILL_BUY_ENABLED = data.get("webhook_skill_buy_enabled", True)
   return {"status": "success"}
 
 @app.get("/config")
