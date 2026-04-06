@@ -56,10 +56,9 @@ def close_career():
     end_3  → Career Rank screen, click Next
     end_4  → SPARKS list: detect 3★ primary spark, click Next
     end_5  → Umamusume Details: if 3★, open favourite picker and select carrot icon; click Close
-    end_6  → career results screen, click Next
-    end_7  → rewards (fans/bond), click Next
-    end_8  → rewards (support cards/items), click Next
-    end_9  → Career Complete dialog, click To Home
+    end_6+ → loop: tap safe-space (speeds up animations), click Next or To Home
+             until the home-screen Career button is visible (handles variable
+             number of event reward screens)
   """
   info("Closing career...")
 
@@ -89,15 +88,57 @@ def close_career():
   _click("assets/buttons/close_btn.png", get_secs(5), "end_5")
   sleep(1)
 
-  for label, desc in (("end_6", "Career Results"), ("end_7", "Rewards (fans)"), ("end_8", "Rewards (items)")):
-    info(f"[{label}] {desc} — clicking Next...")
-    _click("assets/buttons/next_btn.png", get_secs(8), label)
+  info("[end_6+] Advancing through reward screens to home...")
+  _advance_to_home()
+  info("Career closed. Returned to home.")
+
+
+def _advance_to_home(max_iter=25):
+  """Tap, click Next or To Home until the home-screen Career button is visible.
+
+  Replaces the fixed end_6/7/8/9 sequence so that a variable number of event
+  reward screens are handled automatically. Each iteration taps the safe-space
+  area to speed up slow entrance animations (pattern from core/actions.py),
+  then looks for Next or To Home buttons. Exits as soon as the home screen's
+  Career button is detected.
+  """
+  for i in range(max_iter):
+    if device_action.locate(
+      "assets/new_career/career_btn.png",
+      min_search_time=get_secs(1)
+    ):
+      info("[advance] Home screen detected.")
+      return
+
+    # Tap a neutral area to accelerate any slow entrance animation.
+    device_action.click(
+      target=constants.SAFE_SPACE_MOUSE_POS,
+      clicks=3,
+      interval=0.2,
+      text="advance: tap to skip animation"
+    )
+
+    if device_action.locate_and_click(
+      "assets/buttons/next_btn.png",
+      min_search_time=get_secs(2),
+      text="advance: Next"
+    ):
+      sleep(1)
+      continue
+
+    if device_action.locate_and_click(
+      "assets/post_career/to_home_btn.png",
+      min_search_time=get_secs(2),
+      text="advance: To Home",
+      template_scaling=_SAMPLE_SCALE
+    ):
+      sleep(2)
+      continue
+
+    warning(f"[advance] No button found on iteration {i + 1}/{max_iter}")
     sleep(1)
 
-  info("[end_9] Career Complete — clicking To Home...")
-  _click("assets/post_career/to_home_btn.png", get_secs(12), "end_9", _SAMPLE_SCALE)
-  sleep(2)
-  info("Career closed. Returned to home.")
+  warning("[advance] Reached max iterations without detecting home screen.")
 
 
 def _check_three_star_spark() -> bool:
