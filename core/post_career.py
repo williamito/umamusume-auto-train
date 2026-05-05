@@ -19,16 +19,47 @@ _USE_BTN_OFFSET_X = 519
 # upscale to match the bot's 800px capture window.
 _SAMPLE_SCALE = 800 / 768  # ≈ 1.042
 
+# Generic "confirm" buttons tried as a fallback when the primary target is missing.
+# Clicking one clears unexpected blocking dialogs so the step can be retried.
+_FALLBACK_BTNS = (
+  "assets/buttons/confirm_btn.png",
+  "assets/buttons/ok_btn.png",
+  "assets/buttons/ok_2_btn.png",
+)
+
 
 def _click(template, timeout, label, scaling=1.0):
-  """locate_and_click with a warning logged on failure."""
+  """locate_and_click with confirm-button fallback, then debug screenshot on failure.
+
+  If the primary target is not found, tries each button in _FALLBACK_BTNS.
+  When one is present it is clicked and the original step is retried once.
+  Only if neither the target nor any fallback is found (or the retry also fails)
+  is the debug screenshot saved.
+  """
   ok = device_action.locate_and_click(
     template, min_search_time=timeout, text=label, template_scaling=scaling
   )
-  if not ok:
-    warning(f"[{label}] Template not found: {template}")
-    _save_debug_screenshot(label)
-  return ok
+  if ok:
+    return True
+
+  # Primary target missing — look for a generic confirm/OK button that might be
+  # blocking the expected screen, click it, then retry the original step once.
+  for fallback in _FALLBACK_BTNS:
+    coords = device_action.locate(fallback, min_search_time=get_secs(1))
+    if coords:
+      info(f"[{label}] Target not found; clicking fallback {fallback} and retrying.")
+      device_action.click(coords, text=f"{label}: fallback")
+      sleep(1)
+      ok = device_action.locate_and_click(
+        template, min_search_time=timeout, text=f"{label}: retry", template_scaling=scaling
+      )
+      if ok:
+        return True
+      break  # one fallback attempt is enough; fall through to debug screenshot
+
+  warning(f"[{label}] Template not found: {template}")
+  _save_debug_screenshot(label)
+  return False
 
 
 def _save_debug_screenshot(label):
