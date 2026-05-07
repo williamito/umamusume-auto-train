@@ -81,7 +81,7 @@ from utils.notifications import on_started
 from main import focus_umamusume
 
 
-def loop():
+def loop(start_fresh=False):
   config.reload_config()
 
   if args.use_adb:
@@ -91,6 +91,16 @@ def loop():
     bot.use_adb = config.USE_ADB
     if config.DEVICE_ID and config.DEVICE_ID != "":
       bot.device_id = config.DEVICE_ID
+
+  if start_fresh:
+    if not focus_umamusume():
+      error("Failed to focus Umamusume window")
+      bot.is_bot_running = False
+      return
+    init_adb()
+    start_new_career()
+    # If stop_bot() fired during start_new_career(), is_bot_running is already
+    # False and the while loop below will not execute.
 
   while bot.is_bot_running:
     config.reload_config()
@@ -144,9 +154,15 @@ def run_start_career_only():
 
 
 def hotkey_listener():
-  # ctrl+<hotkey> runs only start_new_career() for testing the start flow.
+  # ctrl+<hotkey>: start the auto-loop from scratch (home screen → new career → loop).
+  def _start_fresh_loop():
+    if bot.is_bot_running:
+      return
+    bot.is_bot_running = True
+    threading.Thread(target=lambda: loop(start_fresh=True), daemon=True).start()
+
   keyboard.add_hotkey(f"ctrl+{bot.hotkey}", lambda: threading.Thread(
-    target=run_start_career_only, daemon=True
+    target=_start_fresh_loop, daemon=True
   ).start())
 
   while True:
